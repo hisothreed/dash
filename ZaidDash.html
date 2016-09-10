@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+    <head><title>Anime Nyuzu</title>
+        <script src="http://www.parsecdn.com/js/parse-1.6.14.min.js"></script>
+        <script>
+            Parse.initialize("APmj8ssLZCg787vQ2vYzxAjCTbK2wOWFtmXt4DD7","oANay4xhTHbM3WtcOsuYaFKlUapN1WSOQy4fVIfN");
+            
+            
+        function addRow() {
+        
+          //var TestObject = Parse.Object.extend("TestObject");
+        //   var testObject = new TestObject();
+          // testObject.save({foo: "bar"}).then(function(object) {
+            // alert("yay! it worked");
+           //});
+        
+            var objectsArray = [];
+            
+            var nyuzuClass = Parse.Object.extend("nyuzu");
+            var query = new Parse.Query(nyuzuClass);
+            query.find({
+             success: function(results) {
+            // results is an array of Parse.Object.
+                 objectsArray = results;
+                 console.log(results);
+                 
+                 for (i = 0; i < objectsArray.length; i++) {
+                     
+                 var obj = results[i] 
+                     
+                 var table = document.getElementById("tab");
+                     
+                     
+                     //////
+                 var linktd = document.createElement('td');
+                     
+                 var linknode = document.createTextNode(obj.get("EpisodeLink"));
+                     
+                 linktd.appendChild(linknode);
+                     
+                 var newtr = document.createElement('tr');
+                     
+                 /////////
+                 
+               // var editBut = document.createElement('BUTTON');
+                
+              // var btnnode = document.createTextNode('Edit');
+            // editBut.appendChild(btnnode);
+                     
+             var btntd = document.createElement('td');
+             btntd.innerHTML = '<button type="button" onclick="setform(this)">Edit</button>';
+          //  btntd.appendChild(editBut);
+                 
+                 var epNumtd = document.createElement('td');
+                 var epNumnode = document.createTextNode(obj.get("EpisodeTitle")); 
+                 epNumtd.appendChild(epNumnode);
+                     
+                 var epTitletd = document.createElement('td');
+                 var epTitlenode = document.createTextNode(obj.get("EpisodeNumber")); 
+                 epTitletd.appendChild(epTitlenode);
+                ///////
+                 newtr.appendChild(btntd);
+                 newtr.appendChild(linktd);
+                 newtr.appendChild(epNumtd);
+                 newtr.appendChild(epTitletd);
+                 table.appendChild(newtr);
+                     
+                     
+                     
+              //  editBut.addEventListener("click",function(){ 
+             //   var form = document.getElementById("editingForm");
+              //  form.firstElementChild.setAttribute('Value',btntd.nextElementSibling.innerHTML);
+              //   console.log(obj.get("EpisodeTitle"));
+               //  });
+           }
+         },
+                error: function(error) {
+           // error is an instance of Parse.Error.
+                    console.log(error);
+            }
+             
+              });
+            
+        
+        };
+            
+            
+            function setform(b){ 
+                
+               var form = document.getElementById("editingForm"); 
+               form.firstElementChild.setAttribute('Value',b.parentElement.nextElementSibling.innerHTML);
+               form.children[2].setAttribute('Value',b.parentElement.nextElementSibling.nextElementSibling.innerHTML);
+               form.children[4].setAttribute('Value',b.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.innerHTML);
+                console.log(form);
+                
+                };
+            
+     
+            function search() {
+                
+                var nyuzuClass = Parse.Object.extend("nyuzu");
+                var query = new Parse.Query(nyuzuClass);
+                var title = document.getElementById("titleField");
+  
+                query.equalTo("EpisodeTitle",title.value);
+                
+                query.find({
+                    
+                 success: function(results) {
+                     
+                 console.log(results);
+                 
+                 for (i = 0; i < results.length; i++) {
+                     
+                 var obj = results[i] 
+                     
+                 var table = document.getElementById("tab");
+                     
+                     //////
+                 var linktd = document.createElement('td');
+                     
+                 var linknode = document.createTextNode(obj.get("EpisodeLink"));
+                     
+                 linktd.appendChild(linknode);
+                     
+                 var newtr = document.createElement('tr');
+                     
+                 /////////
+                 
+             var btntd = document.createElement('td');
+             btntd.innerHTML = '<button type="button" onclick="setform(this)">Edit</button>';
+                 
+                 var epNumtd = document.createElement('td');
+                 var epNumnode = document.createTextNode(obj.get("EpisodeNumber")); 
+                 epNumtd.appendChild(epNumnode);
+                     
+                 var epTitletd = document.createElement('td');
+                 var epTitlenode = document.createTextNode(obj.get("EpisodeTitle")); 
+                 epTitletd.appendChild(epTitlenode);
+                ///////
+                 newtr.appendChild(btntd);
+                 newtr.appendChild(linktd);
+                 newtr.appendChild(epNumtd);
+                 newtr.appendChild(epTitletd);
+                 table.appendChild(newtr);
+                     
+                  }
+              }});
+            }
+            
+            function update() {
+            
+                 var nyuzuClass = Parse.Object.extend("nyuzu");
+                 var query = new Parse.Query(nyuzuClass);
+                
+                 var title = document.getElementById('titleField');
+                
+                 query.equalTo("EpisodeTitle",title.value);
+                
+                 query.first({
+                     
+                  success: function(object) {
+                     
+                     console.log(object);
+                     
+                  object.save(null, {
+                     
+                     
+                     success: function(anime){
+                         
+                      anime.set("EpisodeLink",document.getElementById('linkField').value);
+                      anime.set("EpisodeTitle",document.getElementById('titleField').value);
+                      anime.set("EpisodeNumber",document.getElementById('numberField').value);
+                         
+                        anime.save();
+                         
+                        }
+                      }); 
+                     
+                    },
+                      error: function(error) {
+                      alert("Error: " + error.code + " " + error.message);
+                      }
+                 });
+            };
+            
+          
+            
+        </script>
+    <style>
+        
+        body {
+        
+            margin: 0;
+            background-color: rgb(9,0,70);
+            
+        }
+        #title {
+            margin-left: 30px;
+            font-family: sans-serif;
+            font-weight: 100;
+            color: rgb(255,0,0);
+        }
+        #tableTitle {
+            background-color: aliceblue;
+            width: 1000px;
+            height: 900px;
+            text-align: center;
+            margin-top: 200px;
+            margin-left: 10%;
+            font-family: "Avenir Next";
+            font-weight: normal;
+            font-size: 15px;
+            color: rgb(255,0,0);
+        }
+        #nameField input {
+        
+            width: 300px;
+            
+        }
+        #Actions button {
+        
+            margin-top: 10px;
+            width: auto;
+        } 
+        #table {
+        
+            margin-top: 20px;
+            background-color: aquamarine;
+            height: 800px;
+        }
+        .headers {
+            border: 2px solid black;
+            font-size: 17px;
+            width: 500px;
+            padding: 10px;
+            align-content: center;
+        }
+        #edit {
+            
+            width: 20px;
+            
+        }
+        
+        #editingArea {
+        
+            width: 600px;
+            height: 300px;
+            background-color: aqua;
+            margin-top: 100px;
+            margin-left: 15%;
+            
+        }
+        #editingArea input {
+        
+            margin-left: 40px;
+            margin-top: 40px;
+            width: 500px;
+            height: 30px;
+        }
+        #editingArea button {
+        
+            width: 300px;
+            height: 30px;
+            margin-top: 20px;
+            margin-left: 70px;
+        }
+        #scroll {
+        
+            overflow: scroll;
+            height: 800px;
+            
+        }
+    </style>
+        
+    </head>
+    
+ <body>
+        <div id="title">
+            <h1>Anime Nyuzu Admin DashBoard</h1>
+        </div>
+        <div id="tableTitle">
+            <h1 id="t">Anime Series Name</h1>
+            <div id="nameField">
+                <form>
+                    <input id="titleField" type="text" name="name" placeholder="Anime Name">
+                    <button type="button" onclick="search()">Search</button>
+                </form>
+            </div>
+            <div id="Actions">
+                <button type="button" onclick="">reload</button>
+            </div>
+            <div id="table">
+                 <div id="scroll">
+                   <table id="tab">
+                    
+                    <tr id="header">
+                        <th id="edit">#</th>
+                        <th class="headers">Episode Link</th>
+                        <th class="headers">Episode Number</th>
+                        <th class="headers">Episode Title</th>
+                    </tr>
+                  </table>
+                </div>
+            </div>
+            
+            
+        </div>
+     
+     <div id="editingArea">
+         <form id="editingForm">
+             Link
+             <input id="linkField" type="text" name="link"><br>
+             number
+             <input id="numberField" type="text" name="number"><br>
+             title
+             <input id="titleField" type="text" name="title"><br>
+             
+             <button onclick="update()" type="button" name="submit">update</button>
+             
+         </form>
+         
+     </div>
+ </body>
+    
+</html>
