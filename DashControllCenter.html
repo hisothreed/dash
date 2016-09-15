@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+    
+     <head><title>Anime Nyuzu</title>
+         
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+         <script src="http://www.parsecdn.com/js/parse-1.6.14.min.js"></script>
+       
+           
+     </head>
+ 
+    <script>
+        
+        Parse.initialize("APmj8ssLZCg787vQ2vYzxAjCTbK2wOWFtmXt4DD7","oANay4xhTHbM3WtcOsuYaFKlUapN1WSOQy4fVIfN");
+        
+        
+        
+        function Edit(btn) {
+         
+            var btnClass = btn.className;
+            ////
+            var idTdClassName = "td" + btnClass;
+            var idTds = document.getElementsByClassName(idTdClassName);
+            var idTd = idTds[0];
+            var objctId = idTd.innerHTML;
+            ///
+            
+            var epTitleClass = "td"+btnClass+"title"
+            var epTitles = document.getElementsByClassName(epTitleClass);
+            var epTitle = epTitles[0].firstElementChild.value
+            
+            ///
+            var epNumClass = "td"+btnClass+"num"
+            var epNums = document.getElementsByClassName(epNumClass);
+            var epNum = epNums[0].firstElementChild.value
+            ///
+            var epLinkClass = "td"+btnClass+"link"
+            var epLinks = document.getElementsByClassName(epLinkClass);
+            var epLink = epLinks[0].firstElementChild.value;
+            
+            var nyuzuClass = Parse.Object.extend("nyuzu");
+            var query = new Parse.Query(nyuzuClass);
+            query.equalTo("objectId",objctId);
+            query.find({
+             success: function(results) {
+             
+                 Search();
+                 
+            // Do something with the returned Parse.Object values
+           
+             var object = results[0];
+               
+              object.set("EpisodeLink",epLink);
+              object.set("EpisodeTitle",epTitle);
+              object.set("EpisodeNumber",epNum);
+              object.save();
+              
+             
+          },
+                       
+            error: function(error) {
+            alert("Error: " + error.code + " " + error.message);
+            alert("error please try again or call zaid for a solution");
+           }
+                
+        });
+            
+        };
+        
+        function Delete(btn) {
+        
+            var btnClass = btn.className;
+            ////
+            var idTdClassName = "td" + btnClass;
+            var idTds = document.getElementsByClassName(idTdClassName);
+            var idTd = idTds[0];
+            var objctId = idTd.innerHTML;
+            ///
+            var nyuzuClass = Parse.Object.extend("nyuzu");
+            var query = new Parse.Query(nyuzuClass);
+            query.equalTo("objectId",objctId);
+            query.find({
+             success: function(results) {
+             
+            // Do something with the returned Parse.Object values
+            console.log(results);
+             var object = results[0];
+               
+              object.destroy({
+                success: function(myObject) {
+               // The object was deleted from the Parse Cloud.
+                    
+                    Search();
+                    
+                },
+                error: function(myObject, error) {
+                // The delete failed.
+                // error is a Parse.Error with an error code and message.
+                alert("it was not deleted please try again or call zaid for a solution");
+                }
+            });
+             
+          },
+                       
+            error: function(error) {
+            alert("Error: " + error.code + " " + error.message);
+            alert("error please try again or call zaid for a solution");
+           }
+                
+        });
+        };
+        
+        function Search(){
+            
+                var table = document.getElementById("dataTable");
+                while(table.rows.length > 1) {
+                  table.deleteRow(1);
+                 }
+                var nyuzuClass = Parse.Object.extend("nyuzu");
+                var query = new Parse.Query(nyuzuClass);
+                var title = $("#searchField").val();
+  
+                console.log(title);
+                query.equalTo("EpisodeTitle",title);
+                
+                query.find({
+                    
+                 success: function(results) {
+                     
+                 console.log(results);
+                 
+                     
+                     if (results.length < 1) {
+                     
+                         alert("please check your input there is no such a series in database");
+                     
+                     }
+                     
+                 for (i = 0; i < results.length; i++) {
+                     
+                 var obj = results[i]; 
+                //// get the table      
+                 var table = document.getElementById("dataTable");
+                     
+                /// create new tr
+                     
+                 var newtr = document.createElement('tr');     
+                     
+                 /// create the td 
+                 var idTd = document.createElement('td');  
+                 $(idTd).addClass("td"+ i +"")
+                 
+                 $(idTd).css({"padding-left": "20px","padding-right":"20px"});
+                 idTd.innerHTML = obj.id;
+                 console.log(idTd.className);
+                     
+                 var linktd = document.createElement('td');
+                 $(linktd).addClass("td"+ i +"link");
+                 var linknode = document.createElement('input'); 
+                 $(linknode).attr("type","text");
+                 $(linknode).attr("value",obj.get("EpisodeLink"));   
+                 linktd.appendChild(linknode);
+            
+                 
+                 var epNumtd = document.createElement('td');
+                 $(epNumtd).addClass("td"+ i +"num")
+                 var epNumnode = document.createElement('input'); 
+                 $(epNumnode).attr("type","text");
+                 $(epNumnode).attr("value",obj.get("EpisodeNumber"));  
+                 epNumtd.appendChild(epNumnode);
+                     
+                 var epTitletd = document.createElement('td');
+                 $(epTitletd).addClass("td"+ i +"title");
+                 var epTitlenode = document.createElement('input'); 
+                 $(epTitlenode).attr("type","text");
+                 $(epTitlenode).attr("value",obj.get("EpisodeTitle"));  
+                 epTitletd.appendChild(epTitlenode);
+                
+                 var editTd = document.createElement('td');
+                 $(editTd).addClass("td");     
+                     
+                 var editBut = document.createElement('input');
+                 $(editBut).attr("type","button");
+                 $(editBut).attr("onclick","Edit(this)");
+                 $(editBut).val("Edit");
+                 $(editBut).addClass(""+i+"");     
+                 editTd.appendChild(editBut);
+                     
+                     
+                 var deleteTd = document.createElement('td');
+                 $(deleteTd).addClass("td")  
+                 
+                 var deleteBut = document.createElement('input');
+                 $(deleteBut).attr("type","button");
+                 $(deleteBut).attr("onclick","Delete(this)");
+                 $(deleteBut).val("Delete");
+                 $(deleteBut).addClass(""+i+"");    
+                 deleteTd.appendChild(deleteBut);  
+                     
+                     
+                 newtr.appendChild(idTd);
+                 newtr.appendChild(linktd);
+                 newtr.appendChild(epNumtd);
+                 newtr.appendChild(epTitletd);
+                 newtr.appendChild(editTd);
+                 newtr.appendChild(deleteTd);
+                 table.appendChild(newtr);
+                     
+                  }
+              }
+            });
+         }
+            
+            
+        
+        
+        
+        
+    </script>
+
+    <style>
+        
+        body {
+
+            background-color: aliceblue;
+            margin: 0;
+            
+        }
+        
+        
+        #header {
+        
+            background-color: cadetblue;
+            height: 100px;
+            width: 100%;
+            position: fixed;
+            margin-top: 0;
+            min-width: 700px;
+        }
+        #header h1 {
+        
+            font-family: Avenir Next;
+            font-weight: 100;
+            position: relative;
+            margin: 30px;
+             display: inline-block;
+        }
+        #TableDiv {
+            min-width: 600px;
+            width: 1300;
+            height: 800px;
+            background-color: white;
+            position: absolute;
+            margin-top: 200px;
+            left: 10%;
+            box-shadow: 20px 2px 10px gray;
+            overflow: hidden;
+        }
+        #TableHeadText {
+         position: relative;
+         width: 100%;
+         height: 40px;
+         border-bottom: 1px solid silver;    
+         background-color: white;
+        }
+        #TableHeadText h2 {
+        
+            font-family: Avenir Next;
+            font-weight: 100;
+            font-size: 15px;
+            color: silver;
+            position: relative;
+            margin-top: 10px;
+            padding-left: 50px;
+            padding-bottom: 5px;
+            width: 300px;
+            display: inline-block;
+        }
+        #TableHeadText input {
+        
+            float: right;
+            position: relative;
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+        #table {
+         background-color: whitesmoke;    
+         width: 100%;
+         height: 100%;
+         margin-top: -11px;
+         overflow: scroll;
+        }
+        #headerRow {
+        
+            width: 100%;
+            height: 50px;
+            background-color: white;
+            position: relative;
+            margin-top: 20px;
+        }
+        #headerRow th {
+           
+            font-family: Avenir Next;
+            font-weight: 500;
+            font-size: 15px;
+            color: black;
+            position: relative;
+            margin-top: 10px;
+            padding-bottom: 5px;
+            padding-left: 90px;
+            padding-right: 90px;
+            border-bottom: 1px solid silver;
+            
+        }
+        .td {
+        
+            font-family: Avenir Next;
+            font-weight: 500;
+            font-size: 15px;
+            color: black;
+            position: relative;
+            margin-top: 10px;
+            padding-bottom: 5px;
+            padding-left: 90px;
+            padding-right: 90px;
+            border-bottom: 1px solid silver;
+            
+        }
+        #dataTable {
+            width: 100%;
+            margin-top: 10px;
+            
+        }
+    </style>
+    <body>
+        
+      <div id="header">
+      
+          <h1>
+              Anime Nyuzu DashBoard
+          </h1>
+          <h1 style="float:right;position:relative;margin-right:20x;">UserName</h1>
+      </div>
+      
+      <div id="TableDiv">
+          
+        <div id="TableHeadText">
+            
+         <h2>AnimeNyuzu DataTable</h2>
+         <input type="button" value="Search" onclick="Search()" > 
+         <input type="text" placeholder="Anime Series Name" style="width:300px;" id="searchField" >
+          
+        </div>
+          <div id="table">
+           <table id="dataTable">
+            <tr id="headerRow">
+              <th style="padding-left:20px;padding-right:20px;">ID</th>
+              <th class="headers">Episode Link</th>
+              <th class="headers">Episode Number</th>
+              <th class="headers">Episode Title</th>
+              <th class="headers" style="padding-left:40px;padding-right:40px;">Edit</th>
+              <th class="headers" style="padding-left:40px;padding-right:40px;">Delete</th>
+            </tr> 
+           
+           </table>
+          </div>
+     </div>
+     
+   </body>
+    
+</html>
